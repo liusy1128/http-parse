@@ -1,11 +1,9 @@
 #-*-encoding:utf-8-*-
 import sqlite3
 
-        
 
-
-def opendata():
-        conn = sqlite3.connect("http-pcap-data3.db")
+def opendata(dataName):
+        conn = sqlite3.connect(dataName)
         cur = conn.execute("""create table if not exists http_packet(
 timestamp float primary key , sip integer, dip integer ,sport integer,dport integer,method varchar(16),url varchar(256),tcp_packet varchar(1500))""")
         return cur, conn
@@ -35,9 +33,9 @@ def insert(tabel_line,conn):
         #hel[1].close()        
 
  
-def showalldata():
+def showalldata(dataName):
         
-        hel = opendata()
+        hel = opendata(dataName)
         cur = hel[1].cursor()
         cur.execute("select * from http_packet")
         res = cur.fetchall()
@@ -46,36 +44,19 @@ def showalldata():
                         print h,
                 print
         cur.close()
-
-
-
-
-
-
- 
-
- 
-def searchdata():
-        welcome = "--------------------欢迎你使用查询数据库功能-----------------"
-
-        choice = str(raw_input("请输入你要查询的用户的编号："))
-        hel = opendata()
+#select id,riqi,min(shijian) as shijian from kq group by id, riqi
+def GetMin_timestamp(dataName):
+        hel = opendata(dataName)
         cur = hel[1].cursor()
-        cur.execute("select * from tianjia where id="+choice)
-        hel[1].commit()
-        row = cur.fetchone()
-        id1 = str(row[0])
-        username = str(row[1])
-        passworld = str(row[2])
-        address = str(row[3])
-        telnum = str(row[4])
-        print "-------------------恭喜你，你要查找的数据如下---------------------"
-        print ("您查询的数据编号是%s" % id1)
-        print ("您查询的数据名称是%s" % username)
-        print ("您查询的数据密码是%s" % passworld)
-        print ("您查询的数据地址是%s" % address)
-        print ("您查询的数据电话是%s" % telnum)
-        cur.close()
-        hel[1].close()
-# 是否继续
- 
+        cur.execute("select min(timestamp) from http_packet") 
+        res = cur.fetchone()
+        return res[0]
+
+def GetMax_timestamp(dataName):
+        hel = opendata(dataName)
+        cur = hel[1].cursor()
+        cur.execute("select max(timestamp) from http_packet") 
+        res = cur.fetchone()
+        return res[0]
+
+
